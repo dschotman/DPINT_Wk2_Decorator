@@ -17,42 +17,37 @@ namespace DPINT_Wk2_Decorator.Model
         public const string SHOTGUN = "Shotgun";
         public const string STRENGTHEN = "Strengthen";
 
-        public FighterFactory()
-        {
+        public FighterFactory() {
             FighterOptions = new Dictionary<string, string>();
+            FighterOptions[SHOTGUN] = "Adding attack, needs reloading every 2 times.";
+            FighterOptions[POISON] = "A poison for 5 time attacks.";
             FighterOptions[DOUBLE_HANDED] = "A double handed sword for double attack and double defense.";
             FighterOptions[MINION] = "A little minion, adding attack and taking damage before the fighter does.";
-            FighterOptions[POISON] = "A poison for 5 time attacks.";
             FighterOptions[SHIELD] = "Taking all your damase for 3 defenses.";
-            FighterOptions[SHOTGUN] = "Adding attack, needs reloading every 2 times.";
-            
+
             // TODO: Implement strengthen on fighter
             //FighterOptions[STRENGTHEN] = "Increasing attack by 10%, increasing defense by 10%.";
         }
 
-        public IFighter CreateFighter(int lives, int attack, int defense, IEnumerable<string> options)
-        {
-            Fighter fighter = new Fighter(lives, attack, defense);
+        public IFighter CreateFighter(int lives, int attack, int defense, IEnumerable<string> options) {
+            IFighter fighter = new Fighter(lives, attack, defense);
 
-            foreach (var option in options)
-            {
-                switch (option)
-                {
-                    case DOUBLE_HANDED:
-                        fighter.DoubleHanded = true;
-                        break;
-                    case MINION:
-                        fighter.MinionLives = fighter.Lives / 2;
-                        fighter.MinionAttackValue = fighter.AttackValue / 2;
+            foreach (var option in options) {
+                switch (option) {
+                    case SHOTGUN:
+                        fighter = new ShotgunFighterDecorator(fighter);
                         break;
                     case POISON:
-                        fighter.PoisonStrength = 10;
+                        fighter = new PoisonFighterDecorator(fighter);
+                        break;
+                    case DOUBLE_HANDED:
+                        fighter = new DoubleHandedFighterDecorator(fighter);
+                        break;
+                    case MINION:
+                        fighter = new MinionFighterDecorator(fighter);
                         break;
                     case SHIELD:
-                        fighter.ShieldDefends = 3;
-                        break;
-                    case SHOTGUN:
-                        fighter.UseShotgun = true;
+                        fighter = new ShieldFighterDecorator(fighter);
                         break;
                 }
             }
